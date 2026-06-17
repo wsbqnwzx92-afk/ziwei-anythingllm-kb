@@ -70,34 +70,25 @@ class BaseFormatter:
 class MarkdownFormatter(BaseFormatter):
     """Markdown 格式化器 - 针对 AnythingLLM 优化"""
     
+    MAJOR_STARS = [
+        '紫微', '天机', '太阳', '武曲', '天同', '廉贞',
+        '天府', '太阴', '贪狼', '巨门', '天相', '天梁',
+        '七杀', '破军'
+    ]
+    
+    MINOR_STARS = ['左辅', '右弼', '文昌', '文曲', '禄存', '天马', '红鸾', '天喜']
+    
     def format(self) -> str:
         """生成 Markdown 格式的命盘内容"""
         lines = []
-        
-        # 标题和基本信息
         lines.append(self._format_header())
-        
-        # 基本信息表
         lines.append(self._format_basic_info())
-        
-        # 命宫、身宫详解
         lines.append(self._format_ming_shen_analysis())
-        
-        # 十二宫位详表
         lines.append(self._format_palace_table())
-        
-        # 各宫详细解读
         lines.append(self._format_palace_details())
-        
-        # 星曜解释
         lines.append(self._format_star_interpretations())
-        
-        # 四化分析
         lines.append(self._format_four_hua_analysis())
-        
-        # 综合断语
         lines.append(self._format_comprehensive_reading())
-        
         return '\n'.join(lines)
     
     def _format_header(self) -> str:
@@ -141,18 +132,14 @@ class MarkdownFormatter(BaseFormatter):
     def _format_ming_shen_analysis(self) -> str:
         """格式化命宫、身宫的详细分析"""
         lines = []
-        
         ming_gong = self.chart_data['ming_gong']
         shen_gong = self.chart_data['shen_gong']
         
         lines.append("## 命宫 · 身宫深层解读\n")
-        
-        # 命宫分析
         lines.append(f"### 命宫：{ming_gong['name']}\n")
         lines.append(f"**宫位解释**：{self.PALACE_INTERPRETATIONS.get(ming_gong['name'], '')}\n")
         lines.append(f"**宫位序号**：第 {ming_gong['index']} 宫\n")
         
-        # 命宫的星曜详解
         ming_palace = self.chart_data['palaces'][ming_gong['index']]
         if ming_palace['major_stars']:
             lines.append(f"**主星**：{', '.join(ming_palace['major_stars'])}\n")
@@ -164,8 +151,6 @@ class MarkdownFormatter(BaseFormatter):
             lines.append(f"**辅星**：{', '.join(ming_palace['minor_stars'])}\n")
         
         lines.append("\n")
-        
-        # 身宫分析
         lines.append(f"### 身宫：{shen_gong['name']}\n")
         lines.append(f"**宫位解释**：{self.PALACE_INTERPRETATIONS.get(shen_gong['name'], '')}\n")
         lines.append(f"**宫位序号**：第 {shen_gong['index']} 宫\n")
@@ -178,26 +163,22 @@ class MarkdownFormatter(BaseFormatter):
             lines.append(f"**辅星**：{', '.join(shen_palace['minor_stars'])}\n")
         
         lines.append("\n---\n")
-        
-        return '\n'.join(lines)
+        return ''.join(lines)
     
     def _format_palace_table(self) -> str:
         """格式化十二宫位速览表"""
         lines = ["## 十二宫位速览\n"]
-        
         lines.append("| 宫位 | 主星 | 辅星 | 四化 |")
-        lines.append("|------|------|------|------|")
+        lines.append("|------|------|------|------|") 
         
         for palace in self.chart_data['palaces']:
             palace_name = palace['name']
             major_stars = ', '.join(palace['major_stars']) if palace['major_stars'] else '—'
             minor_stars = ', '.join(palace['minor_stars']) if palace['minor_stars'] else '—'
             four_hua_types = ', '.join([h['type'] for h in palace['four_hua']]) if palace['four_hua'] else '—'
-            
             lines.append(f"| {palace_name} | {major_stars} | {minor_stars} | {four_hua_types} |")
         
         lines.append("\n---\n")
-        
         return '\n'.join(lines)
     
     def _format_palace_details(self) -> str:
@@ -206,13 +187,10 @@ class MarkdownFormatter(BaseFormatter):
         
         for palace in self.chart_data['palaces']:
             lines.append(f"### {palace['name']}\n")
-            
-            # 宫位含义
             palace_name = palace['name']
             interpretation = self.PALACE_INTERPRETATIONS.get(palace_name, '')
             lines.append(f"{interpretation}\n")
             
-            # 星曜信息
             if palace['major_stars'] or palace['minor_stars']:
                 lines.append("**星曜组合**：")
                 if palace['major_stars']:
@@ -221,7 +199,6 @@ class MarkdownFormatter(BaseFormatter):
                     lines.append(f"  - 辅星：{', '.join(palace['minor_stars'])}")
                 lines.append("")
             
-            # 四化信息
             if palace['four_hua']:
                 lines.append("**四化星**：")
                 for hua_info in palace['four_hua']:
@@ -231,20 +208,17 @@ class MarkdownFormatter(BaseFormatter):
             lines.append("")
         
         lines.append("---\n")
-        
         return '\n'.join(lines)
     
     def _format_star_interpretations(self) -> str:
         """格式化星曜详解"""
         lines = ["## 星曜详解\n"]
         
-        # 收集命盘中出现的所有星曜
         all_stars = set()
         for palace in self.chart_data['palaces']:
             all_stars.update(palace['major_stars'])
             all_stars.update(palace['minor_stars'])
         
-        # 按类别分类
         major_in_chart = [s for s in self.MAJOR_STARS if s in all_stars]
         minor_in_chart = [s for s in self.MINOR_STARS if s in all_stars]
         
@@ -261,23 +235,19 @@ class MarkdownFormatter(BaseFormatter):
                 lines.append(f"**{star}**\n\n{interpretation}\n\n")
         
         lines.append("---\n")
-        
-        return '\n'.join(lines)
+        return ''.join(lines)
     
     def _format_four_hua_analysis(self) -> str:
         """格式化四化分析"""
         lines = ["## 四化星分析\n"]
-        
         four_hua = self.chart_data['four_hua']
         year_stem = self.chart_data['basic_info']['year_stem']
         
         lines.append(f"**年干：{year_stem}** - 根据年干计算出该命盘的四化星组合\n")
         
         hua_types = ['化禄', '化权', '化科', '化忌']
-        
         for hua_type in hua_types:
             lines.append(f"### {hua_type}\n")
-            
             if hua_type in four_hua:
                 info = four_hua[hua_type]
                 lines.append(f"- **星曜**：{info['star']}")
@@ -287,101 +257,26 @@ class MarkdownFormatter(BaseFormatter):
                 lines.append("（本命盘无此四化）\n")
         
         lines.append("---\n")
-        
-        return '\n'.join(lines)
+        return ''.join(lines)
     
     def _format_comprehensive_reading(self) -> str:
         """格式化综合断语"""
         lines = ["## 综合人生解读\n"]
-        
-        lines.append("### 性格特质\n")
-        lines.append(self._generate_personality_reading())
-        lines.append("\n")
-        
-        lines.append("### 人生主线\n")
-        lines.append(self._generate_destiny_reading())
-        lines.append("\n")
-        
-        lines.append("### 事业前景\n")
-        lines.append(self._generate_career_reading())
-        lines.append("\n")
-        
-        lines.append("### 感情婚姻\n")
-        lines.append(self._generate_relationship_reading())
-        lines.append("\n")
-        
-        lines.append("### 财富运势\n")
-        lines.append(self._generate_wealth_reading())
-        lines.append("\n")
-        
-        lines.append("### 运势指导\n")
-        lines.append(self._generate_guidance())
-        lines.append("\n")
-        
-        lines.append("---\n")
-        lines.append("*本命盘由紫薇斗数排盘系统自动生成，仅供参考学习。本系统基于民间紫薇学派规则。*\n")
-        
-        return '\n'.join(lines)
-    
-    def _generate_personality_reading(self) -> str:
-        """生成性格特质分析"""
-        ming_stars = self.chart_data['palaces'][self.chart_data['ming_gong']['index']]['major_stars']
-        
-        if not ming_stars:
-            return "根据命宫的星曜组合，反映了你独特的性格特质。"
-        
-        readings = []
-        for star in ming_stars[:3]:  # 取前三颗主星
-            reading = self.STAR_INTERPRETATIONS.get(star, f"{star}星影响你的性格。")
-            readings.append(reading)
-        
-        return ''.join([f"- {r}\n" for r in readings]) if readings else "性格特质需要进一步分析。"
-    
-    def _generate_destiny_reading(self) -> str:
-        """生成人生主线分析"""
-        return "根据你的命盘，你的人生主线涉及不断学习、成长和实现自我价值。建议保持对生活的热情，善于把握机遇，同时学会平衡与取舍，让人生在收获与付出间找到和谐。"
-    
-    def _generate_career_reading(self) -> str:
-        """生成事业分析"""
-        return "事业运势需要查看官禄宫（第5宫）。根据该宫的星曜组合，可以判断你的职业适合度、发展前景和可能遇到的挑战。建议充分利用自身优势，在事业上不断精进。"
-    
-    def _generate_relationship_reading(self) -> str:
-        """生成感情分析"""
-        return "感情运势需要查看夫妻宫（第11宫）。根据该宫的星曜组合，可以了解你的感情特质和婚恋前景。真诚待人，用心经营感情，往往能获得美好的感情生活。"
-    
-    def _generate_wealth_reading(self) -> str:
-        """生成财富分析"""
-        four_hua = self.chart_data['four_hua']
-        
-        if '化禄' in four_hua:
-            return f"财富运势较好，尤其是{four_hua['化禄']['palace_name']}宫的事务相对顺利。建议把握机遇，适度投资和积累，可获得稳定的财富增长。"
-        else:
-            return "财富运势需要通过勤奋和理财来实现。建议谨慎消费，规划长期财务目标，逐步积累财富。"
-    
-    def _generate_guidance(self) -> str:
-        """生成运势指导建议"""
-        four_hua = self.chart_data['four_hua']
-        
-        guidance = []
-        
-        if '化禄' in four_hua:
-            palace_name = four_hua['化禄']['palace_name']
-            guidance.append(f"✓ **重点关注**：{palace_name}宫的事务相对顺利，可重点投入和发展，容易获得回报。\n")
-        
-        if '化忌' in four_hua:
-            palace_name = four_hua['化忌']['palace_name']
-            guidance.append(f"⚠ **需要小心**：{palace_name}宫的事务需要多加谨慎，避免盲目蛮干，可能遇到困难和阻碍。\n")
-        
-        guidance.append("• 建议保持平衡心态，既不过度乐观也不过度悲观。\n")
-        guidance.append("• 充分认识自身优势，发扬长处，弥补不足。\n")
-        guidance.append("• 重视人脉和贵人的帮助，保持良好的人际关系。\n")
-        guidance.append("• 定期反思和调整，让人生朝向更好的方向发展。\n")
-        
-        return ''.join(guidance) if guidance else "愿你顺利！保持积极心态，相信美好的未来。\n"
+        lines.append("### 性格特质\n根据命宫星曜组合，你具有独特的个性特质和做事风格。\n\n")
+        lines.append("### 人生主线\n根据你的命盘，建议保持对生活的热情，善于把握机遇，同时学会平衡与取舍。\n\n")
+        lines.append("### 事业前景\n事业运势需要查看官禄宫。根据该宫的星曜组合，可以判断你的职业适合度和发展前景。\n\n")
+        lines.append("### 感情婚姻\n感情运势需要查看夫妻宫。根据该宫的星曜组合，可以了解你的感情特质和婚恋前景。\n\n")
+        lines.append("### 财富运势\n财富运势需要通过勤奋和理财来实现。建议谨慎消费，规划长期财务目标。\n\n")
+        lines.append("### 运势指导\n• 保持平衡心态，既不过度乐观也不过度悲观。\n")
+        lines.append("• 充分认识自身优势，发扬长处，弥补不足。\n")
+        lines.append("• 重视人脉和贵人的帮助，保持良好的人际关系。\n")
+        lines.append("• 定期反思和调整，让人生朝向更好的方向发展。\n\n")
+        lines.append("---\n*本命盘由紫薇斗数排盘系统自动生成，仅供参考学习。*\n")
+        return ''.join(lines)
 
 
 class JSONFormatter(BaseFormatter):
-    """JSON 格式化器 - 用于结构化数据备份和程序化处理"""
+    """JSON 格式化器 - 用于结构化数据备份"""
     
     def format(self) -> str:
         """生成 JSON 格式的命盘数据"""
@@ -395,5 +290,4 @@ class JSONFormatter(BaseFormatter):
                 'four_hua': self.FOUR_HUA_INTERPRETATIONS,
             }
         }
-        
         return json.dumps(output, ensure_ascii=False, indent=2)

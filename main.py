@@ -3,7 +3,6 @@
 """
 紫薇斗数排盘脚本 - AnythingLLM 知识库版本
 支持基础排盘、断语生成、Markdown/JSON 输出
-可进行单个或批量处理
 """
 
 import argparse
@@ -38,7 +37,6 @@ def parse_arguments():
         """
     )
     
-    # 单个排盘参数
     parser.add_argument(
         '--birth',
         type=str,
@@ -56,15 +54,11 @@ def parse_arguments():
         choices=['男', '女'],
         help='性别 (男/女)'
     )
-    
-    # 批量处理
     parser.add_argument(
         '--batch',
         type=str,
-        help='批量处理 CSV 文件路径 (格式: birth_date,hour,gender)'
+        help='批量处理 CSV 文件路径'
     )
-    
-    # 输出配置
     parser.add_argument(
         '--output',
         type=str,
@@ -98,37 +92,19 @@ def process_single_birth(
     output_dir: Path,
     output_format: str = 'both'
 ) -> bool:
-    """
-    处理单个排盘
-    
-    Args:
-        birth_date: 出生日期字符串 (YYYY-MM-DD)
-        hour: 出生时辰
-        gender: 性别
-        output_dir: 输出目录
-        output_format: 输出格式 (both/md/json)
-    
-    Returns:
-        是否成功处理
-    """
+    """处理单个排盘"""
     try:
-        # 验证日期格式
         birth = validate_birth_date(birth_date)
         if birth is None:
             return False
         
         print(f"  处理: {birth_date} {hour}时 {gender}")
         
-        # 创建排盘引擎
         engine = ZiweiEngine(birth, hour, gender)
-        
-        # 生成排盘
         chart_data = engine.calculate()
         
-        # 生成文件名
         filename_base = f"{birth_date}_{hour}_{gender}"
         
-        # Markdown 输出
         if output_format in ['both', 'md']:
             md_formatter = MarkdownFormatter(chart_data)
             md_content = md_formatter.format()
@@ -136,7 +112,6 @@ def process_single_birth(
             md_file.write_text(md_content, encoding='utf-8')
             print(f"    ✓ Markdown: {md_file.name}")
         
-        # JSON 输出
         if output_format in ['both', 'json']:
             json_formatter = JSONFormatter(chart_data)
             json_content = json_formatter.format()
@@ -152,19 +127,9 @@ def process_single_birth(
 
 
 def process_batch(batch_file: str, output_dir: Path, output_format: str = 'both') -> None:
-    """
-    批量处理 CSV 文件
-    
-    Args:
-        batch_file: CSV 文件路径
-        output_dir: 输出目录
-        output_format: 输出格式 (both/md/json)
-    """
+    """批量处理 CSV 文件"""
     try:
-        # 读取 CSV 文件
         df = pd.read_csv(batch_file, encoding='utf-8')
-        
-        # 验证列
         required_cols = ['birth_date', 'hour', 'gender']
         if not all(col in df.columns for col in required_cols):
             print(f"✗ CSV 文件格式错误，需要列: {', '.join(required_cols)}")
@@ -172,14 +137,12 @@ def process_batch(batch_file: str, output_dir: Path, output_format: str = 'both'
         
         total = len(df)
         success_count = 0
-        
         print(f"\n开始批量处理 {total} 条记录...\n")
         
         for idx, row in df.iterrows():
             birth_date = str(row['birth_date']).strip()
             hour = str(row['hour']).strip()
             gender = str(row['gender']).strip()
-            
             if process_single_birth(birth_date, hour, gender, output_dir, output_format):
                 success_count += 1
         
@@ -187,8 +150,6 @@ def process_batch(batch_file: str, output_dir: Path, output_format: str = 'both'
         
     except FileNotFoundError:
         print(f"✗ 批量文件不存在: {batch_file}")
-    except pd.errors.ParserError as e:
-        print(f"✗ CSV 解析错误: {e}")
     except Exception as e:
         print(f"✗ 批量处理错误: {e}")
 
@@ -196,8 +157,6 @@ def process_batch(batch_file: str, output_dir: Path, output_format: str = 'both'
 def main():
     """主函数"""
     args = parse_arguments()
-    
-    # 创建输出目录
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -205,7 +164,6 @@ def main():
     print("紫薇斗数排盘工具 - AnythingLLM 知识库版本")
     print("="*60 + "\n")
     
-    # 单个排盘
     if args.birth and args.hour and args.gender:
         print(f"单个排盘模式")
         print(f"出生日期: {args.birth}")
@@ -219,16 +177,12 @@ def main():
         else:
             print("\n✗ 排盘失败")
             sys.exit(1)
-    
-    # 批量处理
     elif args.batch:
         print(f"批量处理模式")
         print(f"批量文件: {args.batch}")
         print(f"输出格式: {args.format}")
         print(f"输出目录: {output_dir}\n")
-        
         process_batch(args.batch, output_dir, args.format)
-    
     else:
         print("✗ 错误: 请提供参数")
         print("  - 单个排盘: --birth YYYY-MM-DD --hour 时辰 --gender 男/女")
