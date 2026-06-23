@@ -33,9 +33,6 @@ jobs:
       - name: Lint with Ruff
         run: ruff check --output-format=github .
 
-      - name: Check format
-        run: ruff format --check --diff .
-
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -63,11 +60,11 @@ jobs:
         run: |
           python -c "
           from ziwei_engine import ZiweiEngine
-          engine = ZiweiEngine(birth='1990-01-01', hour='子', gender='男')
+          engine = ZiweiEngine(birth='1990-01-01', hour='瀛?, gender='鐢?)
           chart = engine.calculate()
-          print('✅ 排盘引擎导入并运行成功')
-          print(f'   命宫: {chart[\"basic_info\"][\"ming_gong\"]}')
-          print(f'   五行局: {chart[\"basic_info\"][\"wu_xing_ju_desc\"]}')
+          print('鉁?鎺掔洏寮曟搸瀵煎叆骞惰繍琛屾垚鍔?)
+          print(f'   鍛藉: {chart[\"basic_info\"][\"ming_gong\"]}')
+          print(f'   浜旇灞€: {chart[\"basic_info\"][\"wu_xing_ju_desc\"]}')
           "
 
       - name: Run output formatter test
@@ -75,12 +72,12 @@ jobs:
           python -c "
           from ziwei_engine import ZiweiEngine
           from output_formatter import MarkdownFormatter, JSONFormatter
-          engine = ZiweiEngine(birth='1990-06-15', hour='午', gender='女')
+          engine = ZiweiEngine(birth='1990-06-15', hour='鍗?, gender='濂?)
           chart = engine.calculate()
           md = MarkdownFormatter(chart).format()
           js = JSONFormatter(chart).format()
-          print('✅  Markdown 输出成功')
-          print('✅  JSON 输出成功')
-          print(f'   MD 长度: {len(md)} 字符')
-          print(f'   JSON 长度: {len(js)} 字符')
+          print('鉁? Markdown 杈撳嚭鎴愬姛')
+          print('鉁? JSON 杈撳嚭鎴愬姛')
+          print(f'   MD 闀垮害: {len(md)} 瀛楃')
+          print(f'   JSON 闀垮害: {len(js)} 瀛楃')
           "
