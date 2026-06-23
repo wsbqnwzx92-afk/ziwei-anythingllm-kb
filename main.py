@@ -165,7 +165,7 @@ def main():
     print("="*60 + "\n")
     
     if args.birth and args.hour and args.gender:
-        print(f"单个排盘模式")
+        print("单个排盘模式")
         print(f"出生日期: {args.birth}")
         print(f"出生时辰: {args.hour}时")
         print(f"性别: {args.gender}")
@@ -178,7 +178,7 @@ def main():
             print("\n✗ 排盘失败")
             sys.exit(1)
     elif args.batch:
-        print(f"批量处理模式")
+        print("批量处理模式")
         print(f"批量文件: {args.batch}")
         print(f"输出格式: {args.format}")
         print(f"输出目录: {output_dir}\n")

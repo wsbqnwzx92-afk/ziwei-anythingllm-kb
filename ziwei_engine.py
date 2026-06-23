@@ -5,7 +5,7 @@
 遵循传统紫微斗数安星赋、十干四化、大限顺逆规则
 """
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional, Set, Any
+from typing import Dict, List, Set, Any
 
 
 class ZiweiDouShuEngine:
