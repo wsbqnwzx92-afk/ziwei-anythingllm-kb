@@ -59,8 +59,8 @@ jobs:
       - name: Smoke test
         run: |
           python -c "
-          from ziwei_engine import ZiweiEngine
-          engine = ZiweiEngine(birth='1990-01-01', hour='zi', gender='male')
+          from ziwei_engine import ZiweiDouShuEngine
+          engine = ZiweiDouShuEngine(birth='1990-01-01', hour='zi', gender='male')
           chart = engine.calculate()
           print('Engine OK:', chart['basic_info']['ming_gong'])
           "
@@ -68,9 +68,9 @@ jobs:
       - name: Formatter test
         run: |
           python -c "
-          from ziwei_engine import ZiweiEngine
+          from ziwei_engine import ZiweiDouShuEngine
           from output_formatter import MarkdownFormatter, JSONFormatter
-          engine = ZiweiEngine(birth='1990-06-15', hour='wu', gender='female')
+          engine = ZiweiDouShuEngine(birth='1990-06-15', hour='wu', gender='female')
           chart = engine.calculate()
           md = MarkdownFormatter(chart).format()
           js = JSONFormatter(chart).format()
