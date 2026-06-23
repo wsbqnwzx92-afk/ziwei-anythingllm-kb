@@ -1,0 +1,11 @@
+# 排除不需要带入 Docker 镜像的文件
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.github/
+.gitignore
+*.md
+.venv/
+venv/
+env/
